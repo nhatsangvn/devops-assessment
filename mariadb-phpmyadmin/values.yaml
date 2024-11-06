@@ -15,6 +15,16 @@ mariadb:
     max_connections: 200
     max_allowed_packet: 64M
 
+  config_files:
+    my1.cnf: |
+      [mysql]
+      default-character-set = utf8
+
+    my2.cnf: |
+      [mysqld]
+      innodb_buffer_pool_size = 256M
+
+
 phpmyadmin:
   enabled: true
   image:

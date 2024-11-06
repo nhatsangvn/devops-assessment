@@ -28,8 +28,7 @@ spec:
         - containerPort: 3306
         volumeMounts:
           - name: config-volume
-            mountPath: /etc/mysql/conf.d/my.cnf
-            subPath: my.cnf
+            mountPath: /etc/mysql/conf.d
       volumes:
         - name: config-volume
           configMap:

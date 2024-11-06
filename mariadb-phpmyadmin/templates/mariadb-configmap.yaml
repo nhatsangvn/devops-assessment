@@ -7,3 +7,8 @@ data:
     [mysqld]
     max_connections = {{ index .Values.mariadb.config "max_connections" | default "100" }}
     max_allowed_packet = {{ index .Values.mariadb.config "max_allowed_packet" | default "100M" }}
+
+{{- range $filename, $content := .Values.mariadb.config_files }}
+  {{ $filename }}: |
+{{ $content | default "" | indent 4 }}
+{{- end }}
