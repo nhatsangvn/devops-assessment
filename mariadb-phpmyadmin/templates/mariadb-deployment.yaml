@@ -26,4 +26,11 @@ spec:
             value: {{ .Values.mariadb.password }}
         ports:
         - containerPort: 3306
-
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/mysql/conf.d/my.cnf
+            subPath: my.cnf
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "mariadb-phpmyadmin.fullname" . }}-config

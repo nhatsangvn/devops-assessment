@@ -3,10 +3,17 @@ mariadb:
   image:
     repository: mariadb
     tag: latest
+  
+  # env var
   rootPassword: "veryS3c3u!@#"
   database: sang-test
   user: sangnn
   password: "sangnn@123"
+
+  # values for ConfigMap
+  config:
+    max_connections: 200
+    max_allowed_packet: 64M
 
 phpmyadmin:
   enabled: true
