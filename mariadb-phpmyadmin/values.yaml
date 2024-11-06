@@ -32,6 +32,7 @@ phpmyadmin:
     tag: latest
   service:
     type: ClusterIP
+
   ingress:
     enabled: true
     hostname: "phpmyadmin.28.sohan.cloud"
@@ -40,3 +41,11 @@ phpmyadmin:
     tls:
       enabled: true
       secretName: "phpmyadmin-tls"
+
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "20Mi"
+    limits:
+      cpu: "50m"
+      memory: "50Mi"

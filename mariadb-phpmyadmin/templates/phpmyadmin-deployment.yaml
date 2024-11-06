@@ -20,4 +20,14 @@ spec:
             value: {{ include "mariadb-phpmyadmin.fullname" . }}-mariadb
         ports:
         - containerPort: 80
+        resources:
+          {{- with .Values.phpmyadmin.resources }}
+          requests:
+            cpu: {{ .requests.cpu }}
+            memory: {{ .requests.memory }}
+          limits:
+            cpu: {{ .limits.cpu }}
+            memory: {{ .limits.memory }}
+          {{- end }}
+
 
