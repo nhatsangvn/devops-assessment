@@ -1,0 +1,18 @@
+mariadb:
+  enabled: true
+  image:
+    repository: mariadb
+    tag: latest
+  rootPassword: "veryS3c3u!@#"
+  database: sang-test
+  user: sangnn
+  password: "sangnn@123"
+
+phpmyadmin:
+  enabled: true
+  image:
+    repository: phpmyadmin
+    tag: latest
+  service:
+    type: ClusterIP
+

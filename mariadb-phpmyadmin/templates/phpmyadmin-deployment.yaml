@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mariadb-phpmyadmin.fullname" . }}-phpmyadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "mariadb-phpmyadmin.name" . }}-phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: {{ include "mariadb-phpmyadmin.name" . }}-phpmyadmin
+    spec:
+      containers:
+      - name: phpmyadmin
+        image: {{ .Values.phpmyadmin.image.repository }}:{{ .Values.phpmyadmin.image.tag }}
+        env:
+          - name: PMA_HOST
+            value: {{ include "mariadb-phpmyadmin.fullname" . }}-mariadb
+        ports:
+        - containerPort: 80
+

@@ -1,0 +1,9 @@
+apiVersion: v2
+name: mariadb-phpmyadmin
+description: A Helm chart for deploying MariaDB and phpMyAdmin
+maintainers:
+  - name: sangnn
+    email: nnsang1510@gmail.com
+type: application
+version: 0.1.0
+appVersion: "1.1.0"
