@@ -17,13 +17,25 @@ spec:
         image: {{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
         env:
           - name: MARIADB_ROOT_PASSWORD
-            value: {{ .Values.mariadb.rootPassword }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "mariadb-phpmyadmin.fullname" . }}-credentials-secret
+                key: MARIADB_ROOT_PASSWORD
           - name: MARIADB_DATABASE
-            value: {{ .Values.mariadb.database }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "mariadb-phpmyadmin.fullname" . }}-credentials-secret
+                key: MARIADB_DATABASE
           - name: MARIADB_USER
-            value: {{ .Values.mariadb.user }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "mariadb-phpmyadmin.fullname" . }}-credentials-secret
+                key: MARIADB_USER
           - name: MARIADB_PASSWORD
-            value: {{ .Values.mariadb.password }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "mariadb-phpmyadmin.fullname" . }}-credentials-secret
+                key: MARIADB_PASSWORD
         ports:
         - containerPort: 3306
         volumeMounts:
