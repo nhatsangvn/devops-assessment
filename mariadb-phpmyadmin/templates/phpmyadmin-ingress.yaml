@@ -1,0 +1,31 @@
+{{- if .Values.phpmyadmin.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "mariadb-phpmyadmin.fullname" . }}-phpmyadmin
+  labels:
+    app: {{ include "mariadb-phpmyadmin.name" . }}
+  annotations:
+{{- range $key, $value := .Values.phpmyadmin.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+{{- end }}
+spec:
+  {{- if .Values.phpmyadmin.ingress.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.phpmyadmin.ingress.hostname }}
+      secretName: {{ .Values.phpmyadmin.ingress.tls.secretName }}
+  {{- end }}
+  ingressClassName: nginx
+  rules:
+    - host: {{ .Values.phpmyadmin.ingress.hostname }}
+      http:
+        paths:
+          - path: {{ .Values.phpmyadmin.ingress.path | default "/" }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "mariadb-phpmyadmin.fullname" . }}-phpmyadmin
+                port:
+                  number: 80
+{{- end }}

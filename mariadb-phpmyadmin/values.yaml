@@ -32,4 +32,11 @@ phpmyadmin:
     tag: latest
   service:
     type: ClusterIP
-
+  ingress:
+    enabled: true
+    hostname: "phpmyadmin.28.sohan.cloud"
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-staging
+    tls:
+      enabled: true
+      secretName: "phpmyadmin-tls"
