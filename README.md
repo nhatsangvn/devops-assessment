@@ -36,6 +36,17 @@ The `values.yaml` file is configured with the following sections:
 | `mariadb.password`          | Password for the specified user              | `sangnn@123`     |
 | `mariadb.config`            | Custom MariaDB configurations (ConfigMap)    | `{}`             |
 | `mariadb.config_files`      | Custom `.cnf` files for MariaDB (ConfigMap)  | `{}`             |
+| `mariadb.backup.enabled`                                  | Enables or disables automatic backups                     | `false`               |
+| `mariadb.backup.schedule`                                 | Cron schedule for the backup job                          | `"* * * * *"`         |
+| `mariadb.backup.backup_mariadb_user`                      | MariaDB user for the backup process                       | `"mariadb-backup-user"` |
+| `mariadb.backup.backup_mariadb_password`                  | Password for the backup MariaDB user                      | `"mariadb-backup-password"` |
+| `mariadb.backup.storage.type`                             | Storage type for backups                                  | `"s3"`                |
+| `mariadb.backup.storage.s3.access_id`                     | Access key ID for S3                                      | `"your-access-id"`    |
+| `mariadb.backup.storage.s3.secret_key`                    | Secret access key for S3                                  | `"your-secret-key"`   |
+| `mariadb.backup.storage.s3.region`                        | S3 region where the bucket is located                     | `"ap-southeast-1"`    |
+| `mariadb.backup.storage.s3.bucket`                        | S3 bucket name for storing backups                        | `"my-backup-bucket"`  |
+| `mariadb.backup.storage.s3.path`                          | Path within the bucket to store backups                   | `"backup-directory"`  |
+| `mariadb.backup.storage.s3.endpoint_override`             | Custom endpoint for non-AWS S3-compatible storage         | `""`                  |
 
 ### phpMyAdmin Configuration
 | Parameter                             | Description                                         | Default               |

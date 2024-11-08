@@ -24,6 +24,20 @@ mariadb:
       [mysqld]
       innodb_buffer_pool_size = 256M
 
+  backup:
+    enabled: false
+    schedule: "0 3 * * *"
+    backup_mariadb_user: "mariadb-backup-user"
+    backup_mariadb_password: "mariadb-backup-password"
+    storage:
+      type: s3
+      s3:
+        access_id: "your-access-id"
+        secret_key: "your-secret-key"
+        region: "ap-southeast-1"
+        bucket: "my-backup-bucket"
+        path: "backup-directory"
+        endpoint_override: "" # use this if you're using some S3-compatible endpoints (not AWS)
 
 phpmyadmin:
   enabled: true

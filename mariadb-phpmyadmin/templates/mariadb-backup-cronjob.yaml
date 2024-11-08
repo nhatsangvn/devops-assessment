@@ -1,0 +1,74 @@
+{{- if .Values.mariadb.backup.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "mariadb-phpmyadmin.fullname" . }}-backup
+spec:
+  schedule: "{{ .Values.mariadb.backup.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          initContainers:
+            - name: mariadb-backup
+              image: mysql:latest
+              env:
+                - name: BACKUP_MYSQL_USER
+                  value: "{{ .Values.mariadb.backup.backup_mariadb_user }}"
+                - name: BACKUP_MYSQL_PASSWORD
+                  value: "{{ .Values.mariadb.backup.backup_mariadb_password }}"
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  mysqldump -h {{ include "mariadb-phpmyadmin.fullname" . }}-mariadb -u$BACKUP_MYSQL_USER -p$BACKUP_MYSQL_PASSWORD --all-databases | gzip > /backup/db-backup-$(date +\%F).sql.gz
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backup
+
+          {{- if and .Values.mariadb.backup.enabled (eq .Values.mariadb.backup.storage.type "s3") }}
+          containers:
+            - name: s3-uploader
+              image: amazon/aws-cli:latest
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "mariadb-phpmyadmin.fullname" . }}-aws-secret
+                      key: AWS_ACCESS_KEY_ID
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "mariadb-phpmyadmin.fullname" . }}-aws-secret
+                      key: AWS_SECRET_ACCESS_KEY
+                - name: AWS_DEFAULT_REGION
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "mariadb-phpmyadmin.fullname" . }}-aws-secret
+                      key: AWS_DEFAULT_REGION
+                {{- if .Values.mariadb.backup.storage.s3.endpointOverride }}
+                - name: AWS_ENDPOINT_OVERRIDE
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "mariadb-phpmyadmin.fullname" . }}-aws-secret
+                      key: AWS_ENDPOINT_OVERRIDE
+                {{- end }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  if [ -f /backup/db-backup-$(date +\%F).sql.gz ]; then
+                    aws s3 cp /backup/db-backup-$(date +\%F).sql.gz s3://{{ .Values.mariadb.backup.storage.s3.bucket }}/{{ .Values.mariadb.backup.storage.s3.path }}/db-backup-$(date +\%F).sql.gz {{- if .Values.mariadb.backup.storage.s3.endpointOverride }} --endpoint-url $AWS_ENDPOINT_OVERRIDE {{- end }}
+                  else
+                    echo "Backup file not found!"
+                  fi
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backup
+          {{- end }}
+
+          restartPolicy: OnFailure
+          volumes:
+            - name: backup-storage
+              emptyDir: {}
+{{- end }}
