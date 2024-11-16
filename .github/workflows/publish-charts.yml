@@ -1,0 +1,44 @@
+name: Helm Chart CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - ci/add-workflow
+  pull_request:
+    branches:
+      - ci/add-workflow
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v4.2.0
+      with:
+        version: latest
+
+    - name: Log in to Docker
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Lint and Test Helm Chart
+      run: |
+        helm lint ./mariadb-phpmyadmin
+        helm template ./mariadb-phpmyadmin --values ./mariadb-phpmyadmin/values.yaml
+
+    - name: Package Helm Chart
+      run: |
+        helm package ./mariadb-phpmyadmin --destination ./charts
+
+    - name: Push Helm Chart to ghcr.io
+      run: |
+        helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+        helm push ./charts/mariadb-phpmyadmin-*.tgz oci://ghcr.io/${{ github.actor }}
+
