@@ -65,7 +65,7 @@ phpmyadmin:
       memory: "200Mi"
 
   hpa:
-    enabled: true
+    enabled: false
     minReplicas: 2
     maxReplicas: 5
     averageUtilizationCPU: 50

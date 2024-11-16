@@ -64,7 +64,7 @@ The `values.yaml` file is configured with the following sections:
 | `phpmyadmin.resources.requests.memory`| Memory request for phpMyAdmin                       | `50Mi`                |
 | `phpmyadmin.resources.limits.cpu`     | CPU limit for phpMyAdmin                            | `200m`                |
 | `phpmyadmin.resources.limits.memory`  | Memory limit for phpMyAdmin                         | `200Mi`               |
-| `phpmyadmin.hpa.enabled`              | Enables Horizontal Pod Autoscaler                   | `true`                |
+| `phpmyadmin.hpa.enabled`              | Enables Horizontal Pod Autoscaler                   | `false`                |
 | `phpmyadmin.hpa.minReplicas`          | Minimum replicas for phpMyAdmin                     | `2`                   |
 | `phpmyadmin.hpa.maxReplicas`          | Maximum replicas for phpMyAdmin                     | `5`                   |
 | `phpmyadmin.hpa.averageUtilizationCPU`| Target CPU utilization for autoscaling              | `50`                  |
