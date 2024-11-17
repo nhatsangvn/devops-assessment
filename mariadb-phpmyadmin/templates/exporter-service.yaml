@@ -1,0 +1,18 @@
+{{- if .Values.mariadb.exporter.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mariadb-phpmyadmin.fullname" . }}-exporter
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "{{ .Values.mariadb.exporter.metricsPort }}"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  ports:
+  - name: metrics
+    port: {{ .Values.mariadb.exporter.metricsPort }}
+    targetPort: {{ .Values.mariadb.exporter.metricsPort }}
+  selector:
+    app: {{ include "mariadb-phpmyadmin.name" . }}-exporter
+{{- end }}

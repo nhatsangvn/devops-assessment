@@ -1,0 +1,48 @@
+{{- if .Values.mariadb.exporter.enabled }}
+{{- with .Values.mariadb.exporter }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mariadb-phpmyadmin.fullname" $ }}-exporter
+  labels:
+    app: {{ include "mariadb-phpmyadmin.name" $ }}-exporter
+spec:
+  replicas: {{ .replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ include "mariadb-phpmyadmin.name" $ }}-exporter
+  template:
+    metadata:
+      labels:
+        app: {{ include "mariadb-phpmyadmin.name" $ }}-exporter
+    spec:
+      containers:
+      - name: mysqld-exporter
+        image: {{ .image.repository }}:{{ .image.tag }}
+        command:
+          - mysqld_exporter
+        args:
+          - --mysqld.address={{ include "mariadb-phpmyadmin.fullname" $ }}-mariadb:3306
+          - --config.my-cnf=/etc/mysqld-exporter/.my.cnf
+        ports:
+        - containerPort: {{ .metricsPort }}
+          name: metrics
+        resources:
+          requests:
+            cpu: {{ .resources.requests.cpu }}
+            memory: {{ .resources.requests.memory }}
+          limits:
+            cpu: {{ .resources.limits.cpu }}
+            memory: {{ .resources.limits.memory }}
+        {{- if and (hasKey . "mysqlUser" ) (hasKey . "mysqlPassword" ) }}
+        volumeMounts:
+        - name: exporter-config
+          mountPath: /etc/mysqld-exporter/.my.cnf
+          subPath: .my.cnf
+      volumes:
+      - name: exporter-config
+        configMap:
+          name: {{ include "mariadb-phpmyadmin.fullname" $ }}-exporter-config
+        {{- end }}
+{{- end }}
+{{- end }}

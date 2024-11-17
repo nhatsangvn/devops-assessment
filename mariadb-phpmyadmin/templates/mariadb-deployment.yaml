@@ -41,7 +41,15 @@ spec:
         volumeMounts:
           - name: config-volume
             mountPath: /etc/mysql/conf.d
+        {{- if and ( .Values.mariadb.exporter.enabled ) ( .Values.mariadb.exporter.initUser ) }}
+          - name: init-sql
+            mountPath: /docker-entrypoint-initdb.d/exporter-init.sql
+            subPath: exporter-init.sql
+        {{- end }}
       volumes:
         - name: config-volume
           configMap:
-            name: {{ include "mariadb-phpmyadmin.fullname" . }}-config
+            name: {{ include "mariadb-phpmyadmin.fullname" . }}-config      
+        - name: init-sql
+          configMap:
+            name: {{ include "mariadb-phpmyadmin.fullname" . }}-init-sql
