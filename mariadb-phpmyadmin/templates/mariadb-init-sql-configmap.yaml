@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mariadb-phpmyadmin.fullname" . }}-init-sql
+data:
+  tmp.sql: |
+    SHOW DATABASES; # place holder
+{{- if and ( .Values.mariadb.exporter.enabled ) ( .Values.mariadb.exporter.initUser ) }}
+  exporter-init.sql: |
+    CREATE USER '{{ .Values.mariadb.exporter.mysqlUser }}'@'%' IDENTIFIED BY '{{ .Values.mariadb.exporter.mysqlPassword }}' WITH MAX_USER_CONNECTIONS 3;
+    GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO '{{ .Values.mariadb.exporter.mysqlUser }}'@'%';
+    GRANT SLAVE MONITOR ON *.* TO '{{ .Values.mariadb.exporter.mysqlUser }}'@'%';
+{{- end }}

@@ -39,6 +39,23 @@ mariadb:
         path: "backup-directory"
         endpoint_override: "" # use this if you're using some S3-compatible endpoints (not AWS)
 
+  exporter:
+    enabled: false
+    image:
+      repository: prom/mysqld-exporter
+      tag: latest
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "50Mi"
+      limits:
+        cpu: "200m"
+        memory: "200Mi"
+    metricsPort: 9104
+    initUser: true              # will help create exporter user at start of the Mariadb container
+    mysqlUser: exporter         # if you specify yours, set `initUser: false`
+    mysqlPassword: Aa@1234567   # same as above
+
 phpmyadmin:
   enabled: true
   image:
