@@ -3,10 +3,10 @@ name: Helm Chart CI/CD Pipeline
 on:
   push:
     branches:
-      - ci/add-workflow
+      - main
   pull_request:
     branches:
-      - ci/add-workflow
+      - main
 
 jobs:
   build-and-push:
@@ -24,14 +24,16 @@ jobs:
     - name: Lint and Test Helm Chart
       run: |
         helm lint ./mariadb-phpmyadmin
-        helm template ./mariadb-phpmyadmin --values ./mariadb-phpmyadmin/values.yaml
+        helm template ./mariadb-phpmyadmin --values ./mariadb-phpmyadmin/values.yaml --debug
 
     - name: Package Helm Chart
       run: |
         helm package ./mariadb-phpmyadmin --destination ./charts
+      if: github.event_name != 'pull_request'
 
     - name: Push Helm Chart to ghcr.io
       run: |
         echo "${{ secrets.TOKEN }}" |  helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
         helm push ./charts/mariadb-phpmyadmin-*.tgz oci://ghcr.io/${{ github.actor }}
+      if: github.event_name != 'pull_request'
 
