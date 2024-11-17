@@ -15,7 +15,10 @@ This Helm chart deploys MariaDB with phpMyAdmin on a Kubernetes cluster, allowin
 
 ## Installation
 ```bash
-helm upgrade -i mariadb-phpmyadmin oci://ghcr.io/nhatsangvn/mariadb-phpmyadmin -n mariadb --create-namespace
+helm upgrade -i mariadb-phpmyadmin oci://ghcr.io/nhatsangvn/mariadb-phpmyadmin \
+  -f your_values.yaml \
+  -n mariadb --create-namespace \
+  --version <version> # if not specified, the latest is used 
 ```
 
 
@@ -46,15 +49,15 @@ The `values.yaml` file is configured with the following sections:
 | `mariadb.backup.storage.s3.bucket`                        | S3 bucket name for storing backups                        | `"my-backup-bucket"`  |
 | `mariadb.backup.storage.s3.path`                          | Path within the bucket to store backups                   | `"backup-directory"`  |
 | `mariadb.backup.storage.s3.endpoint_override`             | Custom endpoint for non-AWS S3-compatible storage         | `""`                  |
-| `exporter.enabled`       | Boolean | `false`                 | Set to `true` to enable the MySQL exporter.                                                                             |
-| `exporter.image.repository` | String  | `prom/mysqld-exporter`  | The Docker repository for the MySQL exporter image.                                                                     |
-| `exporter.image.tag`     | String  | `latest`                | The tag/version of the MySQL exporter image.                                                                            |
-| `exporter.resources.requests` | Object  | `{cpu: "50m", memory: "50Mi"}` | CPU and memory resource requests for the MySQL exporter container.                                                      |
-| `exporter.resources.limits` | Object  | `{cpu: "200m", memory: "200Mi"}` | CPU and memory resource limits for the MySQL exporter container.                                                        |
-| `exporter.metricsPort`   | Integer | `9104`                  | The port on which the MySQL exporter exposes metrics.                                                                   |
-| `exporter.initUser`      | Boolean | `true`                  | Automatically creates an exporter user (`mysqlUser`) during MariaDB container startup. Set to `false` to use a custom user. |
-| `exporter.mysqlUser`     | String  | `exporter`              | The username for the MySQL exporter. If you specify a custom user, ensure `initUser` is set to `false`.                 |
-| `exporter.mysqlPassword` | String  | `Aa@1234567`            | The password for the MySQL exporter. If you specify a custom password, ensure `initUser` is set to `false`.             |
+| `mariadb.exporter.enabled`       | Boolean | `false`                 | Set to `true` to enable the MySQL exporter.                                                                             |
+| `mariadb.exporter.image.repository` | String  | `prom/mysqld-exporter`  | The Docker repository for the MySQL exporter image.                                                                     |
+| `mariadb.exporter.image.tag`     | String  | `latest`                | The tag/version of the MySQL exporter image.                                                                            |
+| `mariadb.exporter.resources.requests` | Object  | `{cpu: "50m", memory: "50Mi"}` | CPU and memory resource requests for the MySQL exporter container.                                                      |
+| `mariadb.exporter.resources.limits` | Object  | `{cpu: "200m", memory: "200Mi"}` | CPU and memory resource limits for the MySQL exporter container.                                                        |
+| `mariadb.exporter.metricsPort`   | Integer | `9104`                  | The port on which the MySQL exporter exposes metrics.                                                                   |
+| `mariadb.exporter.initUser`      | Boolean | `true`                  | Automatically creates an exporter user (`mysqlUser`) during MariaDB container startup. Set to `false` to use a custom user. |
+| `mariadb.exporter.mysqlUser`     | String  | `exporter`              | The username for the MySQL exporter. If you specify a custom user, ensure `initUser` is set to `false`.                 |
+| `mariadb.exporter.mysqlPassword` | String  | `Aa@1234567`            | The password for the MySQL exporter. If you specify a custom password, ensure `initUser` is set to `false`.             |
 
 ### phpMyAdmin Configuration
 | Parameter                             | Description                                         | Default               |
@@ -204,8 +207,9 @@ import field. Click **Load** > **Import**.
 To upgrade the chart:
 
 ```bash
-vim mariadb-phpmyadmin/values.yaml
-helm upgrade -i  mariadb-phpmyadmin mariadb-phpmyadmin/
+helm upgrade -i mariadb-phpmyadmin oci://ghcr.io/nhatsangvn/mariadb-phpmyadmin \
+  -f your_values.yaml \
+  -n mariadb
 ```
 
 This will apply any updated configuration or version changes.
@@ -214,7 +218,7 @@ This will apply any updated configuration or version changes.
 To uninstall the `mariadb-phpmyadmin` release:
 
 ```bash
-helm uninstall mariadb-phpmyadmin
+helm uninstall -n mariadb mariadb-phpmyadmin
 ```
 
 This will remove all resources associated with the release.
