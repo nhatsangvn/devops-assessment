@@ -3,10 +3,10 @@ name: Helm Chart CI/CD Pipeline
 on:
   push:
     branches:
-      - ci/add-workflow
+      - main
   pull_request:
     branches:
-      - ci/add-workflow
+      - main
 
 jobs:
   build-and-push:
