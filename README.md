@@ -13,7 +13,7 @@ This Helm chart deploys MariaDB with phpMyAdmin on a Kubernetes cluster, allowin
 - If enable backup: need a readonly user and an service account for S3 backup storage
 - If enable monitoring: need a Prometheus and Grafana installed with proper configuration
 
-## Installation
+## Quick Start
 Before installing, you should enable persistence for retain data after pod deletion. First, get the storage class name you want to use:
 ```bash
 $ kubectl get sc
@@ -31,7 +31,7 @@ mariadb:
     storageClass: 'longhorn'
 ```
 > [!TIP]
-> For testing purpose, we can switch persistence.enabled off, although our date will not be stored
+> For testing purpose, we can switch persistence.enabled off, although our data will not be stored
 
 Install the helm chart:
 ```bash
