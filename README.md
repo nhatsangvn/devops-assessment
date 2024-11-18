@@ -30,6 +30,8 @@ mariadb:
     size: 1Gi
     storageClass: 'longhorn'
 ```
+> [!TIP]
+> For testing purpose, we can switch persistence.enabled off, although our date will not be stored
 
 Install the helm chart:
 ```bash
@@ -118,6 +120,7 @@ Use the MariaDB credentials set in `your_values.yaml` to log into phpMyAdmin.
 Before proceeding the backup, we need two credentials:
 1. A readonly service user in Mariadb, which is able to dump all the databases
 2. A access_id and secret_key for any S3 compatible platforms (currently only S3 is supported)
+
 We can enable auto backup all database via these configuration in your_values.yaml:
 ```yaml filename=your_values.yaml
 mariadb:
