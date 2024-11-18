@@ -14,6 +14,24 @@ This Helm chart deploys MariaDB with phpMyAdmin on a Kubernetes cluster, allowin
 - If enable monitoring: need a Prometheus and Grafana installed with proper configuration
 
 ## Installation
+Before installing, you should enable persistence for retain data after pod deletion. First, get the storage class name you want to use:
+```bash
+$ kubectl get sc
+NAME                            PROVISIONER                RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+longhorn (default)              driver.longhorn.io         Delete          Immediate           true                   151d
+```
+
+Second edit your_values.yaml, replace the storageClass with your StorageClass name, in this case it's `longhorn`. If you not defined the storageClass, the default StorageClass (the one has (default) keyword next to its name) is used.
+```yaml filename=your_values.yaml
+mariadb:
+  ...
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: 'longhorn'
+```
+
+Install the helm chart:
 ```bash
 helm upgrade -i mariadb-phpmyadmin oci://ghcr.io/nhatsangvn/mariadb-phpmyadmin \
   -f your_values.yaml \
@@ -38,6 +56,9 @@ The `values.yaml` file is configured with the following sections:
 | `mariadb.password`          | Password for the specified user              | `sangnn@123`     |
 | `mariadb.config`            | Custom MariaDB configurations (ConfigMap)    | `{}`             |
 | `mariadb.config_files`      | Custom `.cnf` files for MariaDB (ConfigMap)  | `{}`             |
+| `mariadb.persistence.enabled`   | Enables persistent storage for MariaDB                 | `true`          |
+| `mariadb.persistence.size`      | Size of the persistent volume to allocate for MariaDB   | `1Gi`           |
+| `mariadb.persistence.storageClass` | StorageClass to use for persistent volume. Set to `''` to use the default StorageClass | `''`             |
 | `mariadb.backup.enabled`                                  | Enables or disables automatic backups                     | `false`               |
 | `mariadb.backup.schedule`                                 | Cron schedule for the backup job                          | `"* * * * *"`         |
 | `mariadb.backup.backup_mariadb_user`                      | MariaDB user for the backup process                       | `"mariadb-backup-user"` |
@@ -91,14 +112,14 @@ Once deployed, you can access phpMyAdmin using the configured Ingress hostname. 
 https://<phpmyadmin-hostname>/
 ```
 
-Use the MariaDB credentials set in `values.yaml` to log into phpMyAdmin.
+Use the MariaDB credentials set in `your_values.yaml` to log into phpMyAdmin.
 
 ### Enable Mariadb auto-backup:
 Before proceeding the backup, we need two credentials:
 1. A readonly service user in Mariadb, which is able to dump all the databases
 2. A access_id and secret_key for any S3 compatible platforms (currently only S3 is supported)
-We can enable auto backup all database via these configuration in values.yaml:
-```
+We can enable auto backup all database via these configuration in your_values.yaml:
+```yaml filename=your_values.yaml
 mariadb:
   ...
   backup:
@@ -111,8 +132,8 @@ The other fields below `backup` section are straigh-forward. For example I'm usi
 > If you are not using S3 but another S3-compatible platform, you need to specify the endpoint explicitly via mariadb.backup.storage.s3.endpoint_override
 
 ### Enable Mariadb monitoring:
-In order to enable monitoring our Mariadb instance, we need to enable the mariadb.expoter.enabled key in the values.yaml:
-```
+In order to enable monitoring our Mariadb instance, we need to enable the mariadb.expoter.enabled key in the your_values.yaml:
+```yaml filename=your_values.yaml
 mariadb:
   ...
   exporter:
@@ -133,7 +154,7 @@ mariadb:
 
 
 By default, this exporter works with Prometheus. If you didn't have any Prometheus source and Grafana, can use the below script for quickly setup these instances:
-```
+```bash filename=install-prometheus-grafana.sh
 ### Setup basic Prometheus with service auto-discovery
 cat > /tmp/prometheus.yaml <<EOF
 server:

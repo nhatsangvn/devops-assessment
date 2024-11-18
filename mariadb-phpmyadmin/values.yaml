@@ -24,6 +24,11 @@ mariadb:
       [mysqld]
       innodb_buffer_pool_size = 256M
 
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: 'csi-sc-cinderplugin-nvme-5000' # it will use default StorageClass if none
+
   backup:
     enabled: false
     schedule: "0 3 * * *"

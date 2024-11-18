@@ -1,8 +1,9 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "mariadb-phpmyadmin.fullname" . }}-mariadb
 spec:
+  serviceName: {{ include "mariadb-phpmyadmin.fullname" . }}-mariadb
   replicas: 1
   selector:
     matchLabels:
@@ -39,6 +40,10 @@ spec:
         ports:
         - containerPort: 3306
         volumeMounts:
+          {{- if .Values.mariadb.persistence.enabled }}
+          - name: mariadb-data
+            mountPath: /var/lib/mysql
+          {{- end }}
           - name: config-volume
             mountPath: /etc/mysql/conf.d
         {{- if and ( .Values.mariadb.exporter.enabled ) ( .Values.mariadb.exporter.initUser ) }}
@@ -53,3 +58,17 @@ spec:
         - name: init-sql
           configMap:
             name: {{ include "mariadb-phpmyadmin.fullname" . }}-init-sql
+{{- if .Values.mariadb.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: mariadb-data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.mariadb.persistence.size }}
+      {{- if .Values.mariadb.persistence.storageClass }}
+      storageClassName: {{ .Values.mariadb.persistence.storageClass }}
+      {{- end }}
+{{- end }}
